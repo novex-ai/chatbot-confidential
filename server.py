@@ -3,3 +3,6 @@ from backend_sanic.api import bp as api_bp
 
 app = Sanic("app")
 app.blueprint(api_bp)
+
+app.static("/", "frontend_vue/dist/index.html", name="index")
+app.static("", "frontend_vue/dist/")
