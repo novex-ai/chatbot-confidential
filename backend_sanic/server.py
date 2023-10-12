@@ -1,9 +1,5 @@
 from sanic import Sanic
-from sanic.response import text
+from .api import bp as api_bp
 
-app = Sanic("penned_pachyderm")
-
-
-@app.get("/")
-async def hello_world(request):
-    return text("Hello, world." + __name__)
+app = Sanic("app")
+app.blueprint(api_bp)
