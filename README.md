@@ -1,4 +1,4 @@
-# penned-pachyderm
+# chatbot-confidential
 fully-contained (no external API calls) knowledgebase chatbot
 
 - deployable on AWS
