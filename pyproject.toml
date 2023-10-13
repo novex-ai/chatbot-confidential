@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "penned-pachyderm"
+name = "chatbot-confidential"
 version = "0.0.1"
 description = "fully-contained (no external API calls) knowledgebase chatbot"
 authors = ["Brad Ito <phlogisticfugu@gmail.com>"]
