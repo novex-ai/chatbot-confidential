@@ -11,10 +11,12 @@ python = "^3.11"
 sanic = {version = "^23.6.0", extras = ["ext"]}
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^7.4.2"
+black = "^23.9.1"
 flake8 = "^6.1.0"
 flake8-black = "^0.3.6"
-black = "^23.9.1"
+mypy = "^1.6.0"
+pytest = "^7.4.2"
+
 
 [build-system]
 requires = ["poetry-core"]
