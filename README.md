@@ -64,6 +64,7 @@ in the `chatbot-confidential` folder:
 poetry run sanic server:app --dev --tls=`echo ~/dev-tls/`
 ```
 
+in a new terminal window, in the `chatbot-confidential` folder:
 ```bash
 cd frontend_quasar_vue
 npm run dev
