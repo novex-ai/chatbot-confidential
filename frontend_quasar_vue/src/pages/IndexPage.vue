@@ -1,5 +1,6 @@
 <template>
   <q-page class="row items-center justify-evenly">
+    {{  VITE_API_BASE_URL  }}
     <example-component
       title="Example component"
       active
@@ -39,4 +40,6 @@ const todos = ref<Todo[]>([
 const meta = ref<Meta>({
   totalCount: 1200
 });
+
+const VITE_API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 </script>
