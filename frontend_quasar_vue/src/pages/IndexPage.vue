@@ -1,6 +1,6 @@
 <template>
   <q-page class="row items-center justify-evenly">
-    {{  VITE_API_BASE_URL  }}
+    {{  api_data  }}
     <example-component
       title="Example component"
       active
@@ -13,7 +13,17 @@
 <script setup lang="ts">
 import { Todo, Meta } from 'components/models';
 import ExampleComponent from 'components/ExampleComponent.vue';
-import { ref } from 'vue';
+import { inject, onBeforeMount, ref } from 'vue';
+import { AxiosInstance } from 'axios';
+
+const $api = inject('$api') as AxiosInstance;
+
+var api_data = ref<object>({'msg': 'no data'})
+
+onBeforeMount(async () => {
+  const response = await $api.get('/hello_world')
+  api_data.value = response.data
+})
 
 const todos = ref<Todo[]>([
   {
@@ -41,5 +51,4 @@ const meta = ref<Meta>({
   totalCount: 1200
 });
 
-const VITE_API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 </script>
