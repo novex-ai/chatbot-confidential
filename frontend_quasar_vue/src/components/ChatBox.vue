@@ -53,14 +53,9 @@ const message = ref<string>('');
 
     .message-container {
         width: 100%;
-        max-width: 600px;
-    }
-    .message-window {
-        width: 100%;
     }
     .input-container {
         width: 100%;
-        max-width: 600px;
     }
 }
 </style>

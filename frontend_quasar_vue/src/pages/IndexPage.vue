@@ -1,5 +1,5 @@
 <template>
-  <q-page class="row items-center justify-evenly">
+  <q-page>
     <chat-box />
   </q-page>
 </template>
