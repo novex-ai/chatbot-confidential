@@ -24,7 +24,7 @@
         <div class="input-container row q-ma-md">
             <q-input
                 v-model.trim="message"
-                filled
+                outlined
                 flat
                 dense
                 placeholder="Type a message..."
