@@ -15,10 +15,10 @@ bp = Blueprint("upload")
 
 @bp.route("/upload", methods={"POST"})
 async def upload(request):
-    for filename, files in request.files.items():
+    for _, files in request.files.items():
         # https://sanic.readthedocs.io/en/stable/sanic/api/core.html#sanic.request.File
         file = files[0]
-
-        logger.info(repr(filename))
-        logger.info(f"{file=} {type(file)=}")
-    return json({"msg": "OK"})
+        path = Path(APP_DATA_PATH, file.name)
+        path.write_bytes(file.body)
+        logger.info(f"wrote uploaded file to {path=}")
+    return json({"status": "OK"})

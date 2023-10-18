@@ -8,7 +8,10 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
+alembic = "^1.12.0"
+nanoid = "^2.0.0"
 sanic = {version = "^23.6.0", extras = ["ext"]}
+sqlalchemy = "^2.0.22"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.9.1"
