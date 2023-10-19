@@ -35,12 +35,11 @@ RUN update-alternatives --install /usr/bin/python python /usr/local/bin/python3.
 
 WORKDIR /sanic
 
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-
+COPY ["run_server.py", "requirements.txt", "./"]
 COPY frontend_quasar_vue/dist frontend_quasar_vue/dist/
-COPY backend_sanic/**/*.py backend_sanic/
-COPY run_server.py .
+COPY backend_sanic/ backend_sanic/
+
+RUN pip install -r requirements.txt
 
 EXPOSE 8000
 CMD ["python", "run_server.py"]
