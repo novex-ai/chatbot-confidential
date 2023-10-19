@@ -42,5 +42,5 @@ COPY frontend_quasar_vue/dist frontend_quasar_vue/dist/
 COPY backend_sanic/**/*.py backend_sanic/
 COPY run_server.py .
 
-
-
+EXPOSE 8000
+CMD ["python", "run_server.py"]
