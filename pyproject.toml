@@ -13,6 +13,7 @@ nanoid = "^2.0.0"
 sanic = {version = "^23.6.0", extras = ["ext"]}
 sqlalchemy = "^2.0.22"
 pgvector = "^0.2.3"
+aiohttp = "^3.8.6"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.9.1"
