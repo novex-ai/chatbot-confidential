@@ -1,0 +1,29 @@
+services:
+  app:
+    build: .
+    ports:
+       - "8000:8000"
+    depends_on:
+      - postgres
+      - ollama
+    environment:
+      APP_DATA_PATH: /data
+      APP_POSTGRES_HOST: postgres:5432
+      APP_POSTGRES_USER: postgres
+      APP_POSTGRES_PASSWORD: postgres
+      APP_POSTGRES_DB: postgres
+      APP_OLLAMA_HOST: ollama:11434
+    volumes:
+      - /tmp/chatbot-data:/data
+  postgres:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
