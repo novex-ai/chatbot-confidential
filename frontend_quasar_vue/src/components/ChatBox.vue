@@ -55,10 +55,11 @@
 </template>
 
 <script setup lang="ts">
-import { inject, ref, reactive } from 'vue';
-import { AxiosInstance } from 'axios';
+import { ref, reactive } from 'vue';
 import { DateTime } from 'luxon';
 import DotsLoader from './DotsLoader.vue';
+
+const VITE_API_BASE_URL = import.meta.env.VITE_API_BASE_URL as string;
 
 interface ConversationTurn {
     input: string;
@@ -66,8 +67,6 @@ interface ConversationTurn {
     reply?: string;
     reply_datetime?: DateTime;
 }
-
-const $api = inject('$api') as AxiosInstance;
 
 const conversation_turns: Array<ConversationTurn> = reactive([
     {
@@ -80,11 +79,20 @@ const conversation_turns: Array<ConversationTurn> = reactive([
 const input_message = ref<string>('');
 
 async function sendMessage() {
+    const next_turn_index = conversation_turns.length;
+    const input = input_message.value;
     conversation_turns.push({
-        input: input_message.value,
+        input: input,
         input_datetime: DateTime.now()
     })
     input_message.value = '';
+    const ws = new WebSocket(`ws://${VITE_API_BASE_URL}/chat`);
+    ws.addEventListener('event', (event: MessageEvent<string>) => {
+        const reply_chunk = event.data;
+        conversation_turns[next_turn_index].reply += reply_chunk;
+        conversation_turns[next_turn_index].reply_datetime = DateTime.now();
+    })
+    ws.send(input);
 }
 
 </script>
