@@ -7,23 +7,35 @@
                 class="message-window"
             >
                 <q-chat-message
-                    label="Sunday, 19th"
+                    label="Chat confidentially with your data"
                 />
-                <q-chat-message
-                    :text="['hey, how are you?']"
-                    sent
-                    stamp="7 minutes ago"
-                />
-                <q-chat-message
-                    :text="['doing fine, how are you?']"
-                    stamp="4 minutes ago"
-                />
+                <template
+                    v-for="(turn, index) in conversation_turns"
+                    :key="index"
+                >
+                    <q-chat-message
+                        v-if="!!turn.input"
+                        :text="[turn.input]"
+                        :stamp="turn.input_datetime && turn.input_datetime.toRelative() || ''"
+                        sent
+                    />
+                    <q-chat-message
+                        v-if="!!turn.reply"
+                        :text="[turn.reply]"
+                        :stamp="turn.reply_datetime && turn.reply_datetime.toRelative() || ''"
+                    />
+                    <q-chat-message
+                        v-if="!turn.reply"
+                    >
+                        <DotsLoader />
+                    </q-chat-message>
+                </template>
             </div>
         </div>
 
         <div class="input-container row q-ma-md">
             <q-input
-                v-model.trim="message"
+                v-model.trim="input_message"
                 outlined
                 flat
                 dense
@@ -35,16 +47,46 @@
                 text-color="blue-10"
                 icon="send"
                 class="col-1"
-                :disable="!message"
+                :disable="!input_message"
+                @click="sendMessage"
             />
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { inject, ref, reactive } from 'vue';
+import { AxiosInstance } from 'axios';
+import { DateTime } from 'luxon';
+import DotsLoader from './DotsLoader.vue';
 
-const message = ref<string>('');
+interface ConversationTurn {
+    input: string;
+    input_datetime?: DateTime;
+    reply?: string;
+    reply_datetime?: DateTime;
+}
+
+const $api = inject('$api') as AxiosInstance;
+
+const conversation_turns: Array<ConversationTurn> = reactive([
+    {
+        input: '',
+        reply: 'How can I help you today?',
+        reply_datetime: DateTime.now()
+    }
+])
+
+const input_message = ref<string>('');
+
+async function sendMessage() {
+    conversation_turns.push({
+        input: input_message.value,
+        input_datetime: DateTime.now()
+    })
+    input_message.value = '';
+}
+
 </script>
 
 <style lang="scss">
