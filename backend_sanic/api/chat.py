@@ -34,6 +34,7 @@ async def chat(request: Request):
     }
     logger.info(f"handling {generate_request=}")
     sanic_response = await request.respond(content_type="text/plain")
+    complete_text = ""
     async with aiohttp.ClientSession() as session:
         async with session.post(generate_url, json=generate_request) as response:
             logger.info(f"{response.status=} from {generate_url=}")
@@ -42,5 +43,7 @@ async def chat(request: Request):
                 data_str = data.decode("utf-8")
                 data_obj = json.loads(data_str)
                 response_text = data_obj["response"]
+                complete_text += response_text
                 await sanic_response.send(response_text)
     await sanic_response.eof()
+    logger.info(f"handled {generate_request=} with {complete_text=}")
