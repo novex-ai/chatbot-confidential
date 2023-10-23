@@ -41,6 +41,7 @@
                 dense
                 placeholder="Type a message..."
                 class="col q-mr-sm shadow-1"
+                @keyup.enter="sendMessage"
             />
             <q-btn
                 unelevated
@@ -79,8 +80,12 @@ const conversation_turns: Array<ConversationTurn> = reactive([
 const input_message = ref<string>('');
 
 async function sendMessage() {
-    const next_turn_index = conversation_turns.length;
     const input = input_message.value;
+    if (!input) {
+        return;
+    }
+
+    const next_turn_index = conversation_turns.length;
     conversation_turns.push({
         input: input,
         input_datetime: DateTime.now(),
@@ -111,6 +116,8 @@ async function sendMessage() {
             }
         }
         conversation_turns[next_turn_index].reply_datetime = DateTime.now();
+    } else {
+        console.error('failed to get chat response reader', { response })
     }
 }
 
