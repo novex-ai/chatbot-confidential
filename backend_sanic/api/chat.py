@@ -6,7 +6,7 @@ import aiohttp
 from sanic import Blueprint, Request
 from sanic.response import text as text_response
 from sanic.log import logger
-from sanic_ext import openapi
+from sanic_ext import openapi, validate
 
 
 APP_OLLAMA_HOST: str = os.environ.get("APP_OLLAMA_HOST", "")
@@ -27,17 +27,17 @@ bp = Blueprint("chat")
 @bp.route("/chat", methods={"POST"})
 @openapi.definition(
     body={"application/json": ChatRequest},
-    summary="Generate text from a prompt msg",
     response=openapi.response(
         200, {"text/plain": str}, "Returns chunked chat completion text"
     ),
 )
-async def chat(request: Request):
+@validate(json=ChatRequest)
+async def chat(request: Request, body: ChatRequest):
+    """Generate text from a prompt msg"""
     generate_url = f"http://{APP_OLLAMA_HOST}/api/generate"
-    data = json.loads(request.body.decode("utf-8"))
-    msg = data.get("msg")
+    msg = body.msg
     if not msg:
-        logger.error(f"{msg=} not provided in {data=} {request.body=}")
+        logger.error(f"{msg=} not provided in {body=} {request.body=}")
         return text_response("error: msg not provided", status=400)
     generate_request = {
         "model": OLLAMA_MODEL,
