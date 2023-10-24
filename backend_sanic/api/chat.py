@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 import json
 import os
 
@@ -5,6 +6,7 @@ import aiohttp
 from sanic import Blueprint, Request
 from sanic.response import text as text_response
 from sanic.log import logger
+from sanic_ext import openapi
 
 
 APP_OLLAMA_HOST: str = os.environ.get("APP_OLLAMA_HOST", "")
@@ -13,13 +15,23 @@ if not APP_OLLAMA_HOST:
 
 OLLAMA_MODEL = "mistral-openorca"
 
+
+@dataclass
+class ChatRequest:
+    msg: str
+
+
 bp = Blueprint("chat")
 
 
-logger.info(f"{APP_OLLAMA_HOST=}")
-
-
 @bp.route("/chat", methods={"POST"})
+@openapi.definition(
+    body={"application/json": ChatRequest},
+    summary="Generate text from a prompt msg",
+    response=openapi.response(
+        200, {"text/plain": str}, "Returns chunked chat completion text"
+    ),
+)
 async def chat(request: Request):
     generate_url = f"http://{APP_OLLAMA_HOST}/api/generate"
     data = json.loads(request.body.decode("utf-8"))
