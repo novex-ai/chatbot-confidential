@@ -14,6 +14,7 @@ nanoid = "^2.0.0"
 pgvector = "^0.2.3"
 sanic = {version = "^23.6.0", extras = ["ext"]}
 sqlalchemy = "^2.0.22"
+psycopg2 = "^2.9.9"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.9.1"
