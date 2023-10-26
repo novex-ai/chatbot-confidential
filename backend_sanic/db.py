@@ -10,12 +10,6 @@ APP_POSTGRES_USER = os.environ.get("APP_POSTGRES_USER", "postgres")
 APP_POSTGRES_PASSWORD = os.environ.get("APP_POSTGRES_PASSWORD", "")
 APP_POSTGRES_DB = os.environ.get("APP_POSTGRES_DB", "postgres")
 
-from contextvars import ContextVar
-from typing import Any
-
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import sessionmaker
-
 connection_url = (
     f"postgresql+asyncpg://{APP_POSTGRES_USER}:{APP_POSTGRES_PASSWORD}"
     f"@{APP_POSTGRES_HOST}/{APP_POSTGRES_DB}"
@@ -23,7 +17,9 @@ connection_url = (
 
 async_engine = create_async_engine(connection_url, echo=True)
 
-_sessionmaker = sessionmaker(async_engine, class_=AsyncSession, expire_on_commit=False)  # type: ignore
+_sessionmaker = sessionmaker(
+    async_engine, class_=AsyncSession, expire_on_commit=False
+)  # type: ignore
 
 _base_model_session_ctx = ContextVar("session")  # type: ignore
 
