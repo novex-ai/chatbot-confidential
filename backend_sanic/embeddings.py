@@ -8,7 +8,7 @@ EMBEDDING_MODEL = "text-embedding-ada-002"
 EMBEDDING_DIMENSIONS = 1536
 
 
-_encoder = tiktoken.get_encoding(EMBEDDING_MODEL)
+_encoder = tiktoken.encoding_for_model(EMBEDDING_MODEL)
 
 
 def encode(input: str) -> List[int]:
