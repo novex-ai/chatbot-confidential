@@ -1,4 +1,5 @@
 import asyncio
+import os
 from logging.config import fileConfig
 
 from sqlalchemy import pool
@@ -6,6 +7,8 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
+
+from backend_sanic.models import metadata
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -20,12 +23,21 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = None
+target_metadata = metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
+APP_POSTGRES_HOST = os.environ.get("APP_POSTGRES_HOST", "localhost")
+APP_POSTGRES_USER = os.environ.get("APP_POSTGRES_USER", "postgres")
+APP_POSTGRES_PASSWORD = os.environ.get("APP_POSTGRES_PASSWORD", "postgres")
+APP_POSTGRES_DB = os.environ.get("APP_POSTGRES_DB", "postgres")
+connection_url = (
+    f"postgresql+asyncpg://{APP_POSTGRES_USER}:{APP_POSTGRES_PASSWORD}"
+    f"@{APP_POSTGRES_HOST}/{APP_POSTGRES_DB}"
+)
+config.set_main_option("sqlalchemy.url", connection_url)
 
 
 def run_migrations_offline() -> None:
