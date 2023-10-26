@@ -1,1 +1,1 @@
-from backend_sanic.app import app
+from backend_sanic.app import app  # noqa

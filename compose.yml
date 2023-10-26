@@ -16,7 +16,7 @@ services:
     volumes:
       - /tmp/chatbot-data:/data
   postgres:
-    image: postgres:16-alpine
+    image: ankane/pgvector:v0.5.1
     ports:
       - "5432:5432"
     environment:

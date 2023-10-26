@@ -3,6 +3,7 @@ import os
 
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.sql import text
 
 
 APP_POSTGRES_HOST = os.environ.get("APP_POSTGRES_HOST", "localhost")
@@ -22,6 +23,12 @@ _sessionmaker = sessionmaker(
 )  # type: ignore
 
 _base_model_session_ctx = ContextVar("session")  # type: ignore
+
+
+async def execute_sql(sql: str):
+    async with _sessionmaker() as session:
+        async with session.begin():
+            await session.execute(text(sql))
 
 
 async def inject_sqlalchemy_session(request):
