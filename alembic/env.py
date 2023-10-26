@@ -31,7 +31,7 @@ target_metadata = metadata
 # ... etc.
 APP_POSTGRES_HOST = os.environ.get("APP_POSTGRES_HOST", "localhost")
 APP_POSTGRES_USER = os.environ.get("APP_POSTGRES_USER", "postgres")
-APP_POSTGRES_PASSWORD = os.environ.get("APP_POSTGRES_PASSWORD", "postgres")
+APP_POSTGRES_PASSWORD = os.environ.get("APP_POSTGRES_PASSWORD", "")
 APP_POSTGRES_DB = os.environ.get("APP_POSTGRES_DB", "postgres")
 connection_url = (
     f"postgresql+asyncpg://{APP_POSTGRES_USER}:{APP_POSTGRES_PASSWORD}"
