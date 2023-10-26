@@ -35,7 +35,7 @@ APP_POSTGRES_PASSWORD = os.environ.get("APP_POSTGRES_PASSWORD", "postgres")
 APP_POSTGRES_DB = os.environ.get("APP_POSTGRES_DB", "postgres")
 
 connection_url = (
-    f"postgresql+psycopg2://{APP_POSTGRES_USER}:{APP_POSTGRES_PASSWORD}"
+    f"postgresql+asyncpg://{APP_POSTGRES_USER}:{APP_POSTGRES_PASSWORD}"
     f"@{APP_POSTGRES_HOST}/{APP_POSTGRES_DB}"
 )
 print(f"{connection_url=}")
