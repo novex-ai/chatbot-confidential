@@ -1,7 +1,10 @@
 from datetime import datetime
 
-from sqlalchemy import DateTime, String, func
+from pgvector.sqlalchemy import Vector  # type: ignore
+from sqlalchemy import DateTime, ForeignKey, String, func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+
+from .embeddings import EMBEDDING_DIMENSIONS
 
 
 # see
@@ -25,6 +28,17 @@ class FileUpload(Base):
     raw_filename: Mapped[str]
     stored_filename: Mapped[str]
     size_bytes: Mapped[int]
+
+
+class EmbeddedChunk(Base):
+    __tablename__ = "embedded_chunk"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    file_upload_id: Mapped[int] = mapped_column(
+        None, ForeignKey("file_upload.id"), nullable=False
+    )
+    chunk_index: Mapped[int]
+    vector: Mapped[Vector] = mapped_column(Vector(EMBEDDING_DIMENSIONS), nullable=False)
 
 
 metadata = Base.metadata

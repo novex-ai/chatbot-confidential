@@ -15,6 +15,7 @@ nanoid = "^2.0.0"
 pgvector = "^0.2.3"
 sanic = {version = "^23.6.0", extras = ["ext"]}
 sqlalchemy = {version = "^2.0.22", extras = ["asyncio"]}
+tiktoken = "^0.5.1"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.9.1"
