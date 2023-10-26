@@ -40,11 +40,12 @@ RUN update-alternatives --install /usr/bin/python python /usr/local/bin/python3.
 
 WORKDIR /sanic
 
-COPY ["run_server.py", "requirements.txt", "./"]
+COPY ["run_entrypoint.sh", "run_server.py", "requirements.txt", "./"]
 COPY frontend_quasar_vue/dist frontend_quasar_vue/dist/
 COPY backend_sanic/ backend_sanic/
 
 RUN pip install -r requirements.txt
 
 EXPOSE 8000
-CMD ["python", "run_server.py"]
+
+CMD ["bash", "run_entrypoint.sh"]
