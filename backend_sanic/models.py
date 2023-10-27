@@ -1,8 +1,9 @@
 from datetime import datetime
+from typing import List
 
 from pgvector.sqlalchemy import Vector  # type: ignore
 from sqlalchemy import DateTime, ForeignKey, String, func
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 from .embeddings import EMBEDDING_DIMENSIONS
 
@@ -29,6 +30,8 @@ class FileUpload(Base):
     stored_filename: Mapped[str]
     size_bytes: Mapped[int]
 
+    chunks: Mapped[List["EmbeddedChunk"]] = relationship(back_populates="file_upload")
+
 
 class EmbeddedChunk(Base):
     __tablename__ = "embedded_chunk"
@@ -39,6 +42,8 @@ class EmbeddedChunk(Base):
     )
     chunk_index: Mapped[int]
     vector: Mapped[Vector] = mapped_column(Vector(EMBEDDING_DIMENSIONS), nullable=False)
+
+    file_upload: Mapped[FileUpload] = relationship(back_populates="chunks")
 
 
 metadata = Base.metadata
