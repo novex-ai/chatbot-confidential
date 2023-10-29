@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 from typing import List, Union
 
-from sentence_transformers import SentenceTransformer
+from sentence_transformers import SentenceTransformer  # type: ignore
 
 
 # https://huggingface.co/spaces/mteb/leaderboard
