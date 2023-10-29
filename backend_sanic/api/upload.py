@@ -38,6 +38,7 @@ async def upload(request: Request):
     chunks = split_chunks(body_bytes, stored_path.suffix)
     logger.info(f"split uploaded file into {len(chunks)} chunks")
     vectors = strings_to_embeddings(chunks)
+    logger.info(f"created {len(vectors)} vector embeddings")
     session = request.ctx.session
     async with session.begin():
         embedded_chunks = []
@@ -54,6 +55,10 @@ async def upload(request: Request):
             chunks=embedded_chunks,
         )
         session.add(file_upload)
+    logger.info(
+        f"saved file_upload {file_upload.id=} {file_upload.raw_filename=}"
+        f" {file_upload.stored_filename=} {file_upload.size_bytes=}"
+    )
     return json({"status": "OK"})
 
 
