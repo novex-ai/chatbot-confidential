@@ -42,6 +42,7 @@ class EmbeddedChunk(Base):
     )
     chunk_index: Mapped[int]
     vector: Mapped[Vector] = mapped_column(Vector(EMBEDDING_DIMENSIONS), nullable=False)
+    chunk_text: Mapped[str] = mapped_column(String, nullable=False)
 
     file_upload: Mapped[FileUpload] = relationship(back_populates="chunks")
 

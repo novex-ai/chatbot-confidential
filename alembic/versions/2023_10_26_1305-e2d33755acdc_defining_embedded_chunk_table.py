@@ -27,7 +27,8 @@ def upgrade() -> None:
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("file_upload_id", sa.Integer(), nullable=False),
         sa.Column("chunk_index", sa.Integer(), nullable=False),
-        sa.Column("vector", pgvector.sqlalchemy.Vector(dim=1536), nullable=False),
+        sa.Column("vector", pgvector.sqlalchemy.Vector(dim=1024), nullable=False),
+        sa.Column("chunk_text", sa.String(), nullable=False),
         sa.Index(
             "vector_hnsw_idx",
             "vector",

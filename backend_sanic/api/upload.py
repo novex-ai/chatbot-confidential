@@ -6,7 +6,7 @@ from sanic import Blueprint, Request
 from sanic.log import logger
 from sanic.response import json
 
-from backend_sanic.embeddings import encode
+from backend_sanic.embeddings import strings_to_embeddings
 from backend_sanic.file import make_stored_filename
 from backend_sanic.models import FileUpload, EmbeddedChunk
 from backend_sanic.text import split_text_chunks
@@ -15,6 +15,9 @@ from backend_sanic.text import split_text_chunks
 APP_DATA_PATH: str = os.environ.get("APP_DATA_PATH", "")
 if not APP_DATA_PATH:
     raise Exception("APP_DATA_PATH environment variable not set")
+
+_upload_path = Path(APP_DATA_PATH, "uploads")
+_upload_path.mkdir(parents=True, exist_ok=True)
 
 bp = Blueprint("upload")
 
@@ -34,13 +37,15 @@ async def upload(request: Request):
     logger.info(f"wrote uploaded file to {stored_path=}")
     chunks = split_chunks(body_bytes, stored_path.suffix)
     logger.info(f"split uploaded file into {len(chunks)} chunks")
-    vectors = [encode(chunk) for chunk in chunks]
+    vectors = strings_to_embeddings(chunks)
     session = request.ctx.session
     async with session.begin():
         embedded_chunks = []
-        for i, vector in enumerate(vectors):
-            logger.info(f"{i=} {len(vector)=}")
-            embedded_chunk = EmbeddedChunk(chunk_index=i, vector=vector)
+        for i, (chunk_text, vector) in enumerate(zip(chunks, vectors)):
+            logger.info(f"{i=} {len(chunk_text)=} {len(vector)=}")
+            embedded_chunk = EmbeddedChunk(
+                chunk_index=i, vector=vector, chunk_text=chunk_text
+            )
             embedded_chunks.append(embedded_chunk)
         file_upload = FileUpload(
             raw_filename=raw_filename,
@@ -54,7 +59,7 @@ async def upload(request: Request):
 
 def store_file(raw_filename: str, body_bytes: bytes) -> Path:
     stored_filename = make_stored_filename(raw_filename)
-    stored_path = Path(APP_DATA_PATH, stored_filename)
+    stored_path = Path(_upload_path, stored_filename)
     with stored_path.open("wb") as f:
         f.write(body_bytes)
     return stored_path
