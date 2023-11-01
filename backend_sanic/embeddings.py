@@ -10,6 +10,7 @@ import backend_sanic
 # https://huggingface.co/thenlper/gte-large
 EMBEDDING_MODEL = "thenlper--gte-large"
 EMBEDDING_DIMENSIONS = 1024
+EMBEDDING_MAX_TOKENS = 512
 
 
 model_path = Path(Path(backend_sanic.__path__[0]).parent, "models", EMBEDDING_MODEL)
