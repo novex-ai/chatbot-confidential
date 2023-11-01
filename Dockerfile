@@ -43,13 +43,10 @@ WORKDIR /sanic
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 
+COPY models/ models/
 COPY ["run_entrypoint.sh", "run_cache_model.py", "run_server.py", "./"]
 COPY frontend_quasar_vue/dist frontend_quasar_vue/dist/
 COPY backend_sanic/ backend_sanic/
-
-ENV APP_MODEL_CACHE_PATH = /sanic/model_cache
-
-RUN python run_cache_model.py
 
 EXPOSE 8000
 

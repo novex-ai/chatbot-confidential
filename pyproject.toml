@@ -17,7 +17,6 @@ sanic = {version = "^23.6.0", extras = ["ext"]}
 sentence-transformers = "^2.2.2"
 sqlalchemy = {version = "^2.0.22", extras = ["asyncio"]}
 langchain = "^0.0.324"
-huggingface-hub = "^0.18.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.9.1"
