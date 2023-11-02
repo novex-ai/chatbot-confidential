@@ -25,7 +25,11 @@ _sessionmaker = sessionmaker(
 _base_model_session_ctx = ContextVar("session")  # type: ignore
 
 
-async def execute_sql(sql: str):
+def make_session() -> AsyncSession:
+    return _sessionmaker()
+
+
+async def execute_sql_text(sql: str):
     async with _sessionmaker() as session:
         async with session.begin():
             await session.execute(text(sql))

@@ -51,7 +51,7 @@ class EmbeddedChunk(Base):
         None, ForeignKey("file_upload.id"), nullable=False
     )
     chunk_index: Mapped[int]
-    vector: Mapped[Vector] = mapped_column(Vector(EMBEDDING_DIMENSIONS), nullable=False)
+    vector: Mapped[Vector] = mapped_column(Vector(EMBEDDING_DIMENSIONS), nullable=True)
     chunk_text: Mapped[str] = mapped_column(String, nullable=False)
 
     vector_hnsw_idx = Index(
