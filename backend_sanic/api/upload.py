@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 from typing import List
 
+from pypdf import PdfReader
 from sanic import Blueprint, Request
 from sanic.log import logger
 from sanic.response import json
@@ -70,6 +71,13 @@ def split_chunks(stored_path: Path) -> List[str]:
         body_bytes = stored_path.read_bytes()
         input = body_bytes.decode("utf-8")
         chunks = split_text_chunks(input)
+    elif file_extension == ".pdf":
+        pdf_reader = PdfReader(str(stored_path))
+        chunks = []
+        for i, page in enumerate(pdf_reader.pages):
+            page_text = page.extract_text()
+            logger.info(f"{i=} processing page with {len(page_text)=}")
+            chunks += split_text_chunks(page_text)
     else:
         raise Exception(f"unknown file extension {file_extension}")
     return chunks
