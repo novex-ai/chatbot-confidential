@@ -9,9 +9,11 @@
 
         <q-space />
 
+        <!--
         <q-tabs>
           <q-route-tab to="/settings" label="Settings" />
         </q-tabs>
+        -->
       </q-toolbar>
     </q-header>
 
