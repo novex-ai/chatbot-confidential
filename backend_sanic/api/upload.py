@@ -62,8 +62,12 @@ def store_file(raw_filename: str, body_bytes: bytes) -> Path:
     return stored_path
 
 
-def split_chunks(body_bytes: bytes, file_extension: str) -> List[str]:
+def split_chunks(stored_path: Path) -> List[str]:
+    if not stored_path.is_file():
+        raise Exception(f"could not find {stored_path=}")
+    file_extension = stored_path.suffix
     if file_extension == ".txt":
+        body_bytes = stored_path.read_bytes()
         input = body_bytes.decode("utf-8")
         chunks = split_text_chunks(input)
     else:
@@ -85,7 +89,9 @@ async def process_file_upload(file_upload_id: int):
             file_upload.status = "PROCESSING"
     stored_filename = file_upload.stored_filename
     stored_path = Path(_upload_path, stored_filename)
-    text_chunks = split_chunks(stored_path.read_bytes(), stored_path.suffix)
+    # TODO - consider using a generator to be able to handle large files
+    # then process chunks in batches
+    text_chunks = split_chunks(stored_path)
     logger.info(f"split file into {len(text_chunks)=}")
     vectors = []
     for i, chunk_text in enumerate(text_chunks):
