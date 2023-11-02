@@ -2,26 +2,35 @@
     <q-table
         title="Knowledge Files"
         :columns="columns"
-        :rows="rows"
+        :rows="file_uploads"
         row-key="name"
     />
 </template>
 
-<script setup>
-const columns = [
+<script setup lang="ts">
+import { inject, onBeforeMount, ref } from 'vue';
+import { AxiosInstance } from 'axios';
+
+const columns: {
+    name: string;
+    label: string;
+    field: string | ((row: object) => string | number);
+    required?: boolean; align?: 'center' | 'left' | 'right';
+    sortable?: boolean;
+}[] = [
+    {
+        name: 'uploaded',
+        align: 'center',
+        label: 'Uploaded',
+        field: 'uploaded_at',
+        sortable: true
+    },
     {
         name: 'name',
         required: true,
         label: 'Name',
         align: 'left',
-        field: 'name',
-        sortable: true
-    },
-    {
-        name: 'uploaded',
-        align: 'center',
-        label: 'Uploaded',
-        field: 'uploaded',
+        field: 'raw_filename',
         sortable: true
     },
     {
@@ -29,7 +38,13 @@ const columns = [
         align: 'right',
         label: 'Size (bytes)',
         field: 'size_bytes',
-        format: (val) => val.toFixed(2),
+        sortable: true
+    },
+    {
+        name: 'num_chunks',
+        align: 'right',
+        label: 'Num Chunks',
+        field: 'num_chunks',
         sortable: true
     },
     {
@@ -41,18 +56,19 @@ const columns = [
     }
 ];
 
-const rows = [
-    {
-        name: 'sales_call_transcript_001.txt',
-        uploaded: '2023-09-01 12:00:00',
-        size_bytes: 123456,
-        status: 'PROCESSED'
-    },
-    {
-        name: 'sales_training.txt',
-        uploaded: '2023-09-03 12:00:00',
-        size_bytes: 500000,
-        status: 'PROCESSED'
-    }
-];
+const $api = inject('$api') as AxiosInstance;
+
+const file_uploads = ref<object[]>([]);
+
+async function getFileUploads() {
+    const response = await $api.get('/file_uploads')
+    file_uploads.value = response.data.file_uploads
+}
+
+onBeforeMount(getFileUploads)
+
+defineExpose({
+    getFileUploads
+})
+
 </script>
