@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 from typing import List
 
+from docx import Document as DocxDocument  # type: ignore
 from pypdf import PdfReader
 from sanic import Blueprint, Request
 from sanic.log import logger
@@ -77,7 +78,20 @@ def split_chunks(stored_path: Path) -> List[str]:
         for i, page in enumerate(pdf_reader.pages):
             page_text = page.extract_text()
             logger.info(f"{i=} processing page with {len(page_text)=}")
-            chunks += split_text_chunks(page_text)
+            if len(page_text) > 1000:
+                chunks += split_text_chunks(page_text)
+            elif len(page_text) > 0:
+                chunks.append(page_text)
+    elif file_extension == ".docx":
+        document = DocxDocument(str(stored_path))
+        chunks = []
+        for i, paragraph in enumerate(document.paragraphs):
+            paragraph_text = paragraph.text
+            logger.info(f"{i=} processing paragraph with {len(paragraph_text)=}")
+            if len(paragraph_text) > 1000:
+                chunks += split_text_chunks(paragraph_text)
+            elif len(paragraph_text) > 0:
+                chunks.append(paragraph_text)
     else:
         raise Exception(f"unknown file extension {file_extension}")
     return chunks
