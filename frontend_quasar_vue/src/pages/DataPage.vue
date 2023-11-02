@@ -7,6 +7,7 @@
             :url="uploaderUrl"
             label="Upload Knowledge Files"
             color="primary"
+            accept=".txt"
             multiple
             style="width: 100%;"
             @finish="onFileUploadFinish"
