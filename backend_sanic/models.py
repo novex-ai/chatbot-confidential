@@ -32,6 +32,16 @@ class FileUpload(Base):
 
     chunks: Mapped[List["EmbeddedChunk"]] = relationship(back_populates="file_upload")
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "uploaded_at": self.uploaded_at.isoformat() if self.uploaded_at else None,
+            "status": self.status,
+            "raw_filename": self.raw_filename,
+            "stored_filename": self.stored_filename,
+            "size_bytes": self.size_bytes,
+        }
+
 
 class EmbeddedChunk(Base):
     __tablename__ = "embedded_chunk"
