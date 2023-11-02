@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import List
 
 from pgvector.sqlalchemy import Vector  # type: ignore
-from sqlalchemy import DateTime, ForeignKey, String, func
+from sqlalchemy import DateTime, ForeignKey, Index, String, func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 from .embeddings import EMBEDDING_DIMENSIONS
@@ -43,6 +43,14 @@ class EmbeddedChunk(Base):
     chunk_index: Mapped[int]
     vector: Mapped[Vector] = mapped_column(Vector(EMBEDDING_DIMENSIONS), nullable=False)
     chunk_text: Mapped[str] = mapped_column(String, nullable=False)
+
+    vector_hnsw_idx = Index(
+        "vector_hnsw_idx",
+        vector,
+        postgresql_using="hnsw",
+        postgresql_with={"m": 16, "ef_construction": 64},
+        postgresql_ops={"vector": "vector_cosine_ops"},
+    )
 
     file_upload: Mapped[FileUpload] = relationship(back_populates="chunks")
 
