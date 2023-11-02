@@ -35,6 +35,6 @@
 <style lang="scss">
 .app-page {
   width: 100%;
-  max-width: 600px;
+  max-width: 760px;
 }
 </style>
