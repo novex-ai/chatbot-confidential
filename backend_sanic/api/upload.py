@@ -11,7 +11,7 @@ from sqlalchemy import select
 
 from backend_sanic.api_generate import generate_text
 from backend_sanic.db import make_session
-from backend_sanic.embeddings import strings_to_embeddings
+from backend_sanic.embeddings import string_to_embeddings
 from backend_sanic.file import make_stored_filename
 from backend_sanic.models import FileUpload, EmbeddedChunk
 from backend_sanic.text import split_text_chunks
@@ -125,7 +125,7 @@ async def process_file_upload(file_upload_id: int):
             data = await response.json()
             question = data["response"]
             logger.debug(f"generated question {i=} {question=}")
-        vector = strings_to_embeddings(question)
+        vector = string_to_embeddings(question)
         logger.info(
             f"processed {i=} {len(chunk_text)=} {len(question)=} {len(vector)=}"
         )

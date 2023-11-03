@@ -14,11 +14,14 @@ asyncpg = "^0.28.0"
 nanoid = "^2.0.0"
 pgvector = "^0.2.3"
 sanic = {version = "^23.6.0", extras = ["ext"]}
-sentence-transformers = "^2.2.2"
 sqlalchemy = {version = "^2.0.22", extras = ["asyncio"]}
 langchain = "^0.0.324"
 pypdf = "^3.17.0"
 python-docx = "^1.0.1"
+torch = "^2.1.0"
+transformers = "^4.35.0"
+onnxruntime = "^1.16.1"
+psutil = "^5.9.6"
 
 
 [tool.poetry.group.dev.dependencies]

@@ -8,7 +8,7 @@ from sanic_ext import openapi, validate
 from sqlalchemy import select
 
 from backend_sanic.api_generate import generate_text
-from backend_sanic.embeddings import strings_to_embeddings
+from backend_sanic.embeddings import string_to_embeddings
 from backend_sanic.models import EmbeddedChunk
 
 
@@ -35,7 +35,7 @@ async def chat(request: Request, body: ChatRequest):
     if not chat_msg:
         logger.error(f"{chat_msg=} not provided in {body=} {request.body=}")
         return text_response("error: msg not provided", status=400)
-    chat_embedding = strings_to_embeddings(chat_msg)
+    chat_embedding = string_to_embeddings(chat_msg)
     logger.info(f"{chat_msg=} {chat_embedding=}")
     session = request.ctx.session
     async with session.begin():
