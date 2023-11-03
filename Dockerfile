@@ -44,9 +44,10 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt
 
 COPY models/ models/
-COPY ["run_entrypoint.sh", "run_server.py", "./"]
-COPY frontend_quasar_vue/dist frontend_quasar_vue/dist/
+COPY ["alembic.ini", "run_entrypoint.sh", "run_server.py", "./"]
+COPY alembic/ alembic/
 COPY backend_sanic/ backend_sanic/
+COPY frontend_quasar_vue/dist/ frontend_quasar_vue/dist/
 
 EXPOSE 8000
 
