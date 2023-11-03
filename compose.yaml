@@ -14,7 +14,7 @@ services:
       APP_POSTGRES_DB: postgres
       APP_OLLAMA_HOST: ollama:11434
     volumes:
-      - /tmp/chatbot-data:/data
+      - /data
   postgres:
     image: ankane/pgvector:v0.5.1
     ports:
@@ -23,7 +23,11 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
+    volumes:
+      - /var/lib/postgresql/data
   ollama:
     image: ollama/ollama:latest
     ports:
       - "11434:11434"
+    volumes:
+      - /root/.ollama
