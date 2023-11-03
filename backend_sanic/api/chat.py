@@ -40,8 +40,8 @@ async def chat(request: Request, body: ChatRequest):
     async with session.begin():
         result = await session.scalars(
             select(EmbeddedChunk)
-            .filter(EmbeddedChunk.vector.l2_distance(chat_embedding) > 0.8)
-            .order_by(EmbeddedChunk.vector.l2_distance(chat_embedding).desc())
+            .filter(EmbeddedChunk.vector.l2_distance(chat_embedding) < 0.2)
+            .order_by(EmbeddedChunk.vector.l2_distance(chat_embedding).asc())
             .limit(4)
         )
         close_chunks = result.all()
@@ -56,6 +56,10 @@ question at the end. If you don't know the answer, just say that you don't know,
 
 Question: {chat_msg}
 """
+    elif chat_msg.endswith("?"):
+        prompt_msg = f"""
+Answer the following question.  If you don't know the answer, just say that you don't know, don't try to make up an answer.
+Question: {chat_msg}"""
     else:
         prompt_msg = chat_msg
     sanic_response = await request.respond(content_type="text/plain")
