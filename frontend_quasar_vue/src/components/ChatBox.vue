@@ -61,6 +61,7 @@ import { DateTime } from 'luxon';
 import DotsLoader from './DotsLoader.vue';
 
 const VITE_API_BASE_URL = import.meta.env.VITE_API_BASE_URL as string;
+const chat_api_url = `${VITE_API_BASE_URL}/chat`;
 
 interface ConversationTurn {
     input: string;
@@ -87,14 +88,18 @@ async function sendMessage() {
     })
     input_message.value = '';
 
-    const response = await fetch(`${VITE_API_BASE_URL}/chat`, {
+    const body = JSON.stringify({
+        msg: input
+    })
+
+    console.log('sending chat message', { body, chat_api_url })
+
+    const response = await fetch(chat_api_url, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-            msg: input
-        })
+        body
     })
     const reader = response.body?.getReader();
     if (reader) {
