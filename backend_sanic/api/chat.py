@@ -30,6 +30,7 @@ bp = Blueprint("chat")
 @validate(json=ChatRequest)
 async def chat(request: Request, body: ChatRequest):
     """Generate text from a prompt msg"""
+    logger.info(f"handling {body=}")
     chat_msg = body.msg
     if not chat_msg:
         logger.error(f"{chat_msg=} not provided in {body=} {request.body=}")
