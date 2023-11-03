@@ -49,18 +49,21 @@ async def chat(request: Request, body: ChatRequest):
     async with session.begin():
         result = await session.scalars(
             select(EmbeddedChunk)
-            .filter(EmbeddedChunk.vector.l2_distance(chat_embedding) < 0.2)
+            .filter(EmbeddedChunk.vector.l2_distance(chat_embedding) > 0.8)
             .order_by(EmbeddedChunk.vector.l2_distance(chat_embedding).desc())
-            .limit(3)
+            .limit(4)
         )
         close_chunks = result.all()
         logger.info(f"{close_chunks=}")
     if len(close_chunks) > 0:
         close_texts = [chunk.chunk_text for chunk in close_chunks]
         context = "\n###\n".join(close_texts)
-        prompt_msg = f"""Use the following context to respond to the message.
-context: {context}\n###
-message: {chat_msg}
+        prompt_msg = f"""Use the following pieces of context to answer the
+question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer.
+
+{context}
+
+Question: {chat_msg}
 """
     else:
         prompt_msg = chat_msg
