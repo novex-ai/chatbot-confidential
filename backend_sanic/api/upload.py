@@ -9,6 +9,7 @@ from sanic.log import logger
 from sanic.response import json
 from sqlalchemy import select
 
+from backend_sanic.api_generate import generate_text
 from backend_sanic.db import make_session
 from backend_sanic.embeddings import strings_to_embeddings
 from backend_sanic.file import make_stored_filename
@@ -117,8 +118,17 @@ async def process_file_upload(file_upload_id: int):
     logger.info(f"split file into {len(text_chunks)=}")
     vectors = []
     for i, chunk_text in enumerate(text_chunks):
-        vector = strings_to_embeddings(chunk_text)
-        logger.info(f"processed {i=} {len(chunk_text)=} {len(vector)=}")
+        # TODO consider generating multiple questions per chunk
+        prompt_msg = f"Generate a standard question that is best answered by the following: {chunk_text}"
+        async with generate_text(logger, prompt_msg, stream=False) as response:
+            response.raise_for_status()
+            data = await response.json()
+            question = data["response"]
+            logger.debug(f"generated question {i=} {question=}")
+        vector = strings_to_embeddings(question)
+        logger.info(
+            f"processed {i=} {len(chunk_text)=} {len(question)=} {len(vector)=}"
+        )
         vectors.append(vector)
     async with make_session() as session:
         async with session.begin():

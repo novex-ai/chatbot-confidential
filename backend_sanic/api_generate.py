@@ -19,7 +19,7 @@ async def generate_text(logger, prompt_msg: str, stream: bool):
         "prompt": prompt_msg,
         "stream": stream,
     }
-    logger.info(f"handling {generate_request=}")
+    logger.debug(f"handling {generate_request=}")
     session = aiohttp.ClientSession()
     try:
         response = await session.post(generate_url, json=generate_request)
