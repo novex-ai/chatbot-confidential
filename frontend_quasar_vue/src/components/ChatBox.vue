@@ -56,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue';
+import { onMounted, ref, reactive } from 'vue';
 import { DateTime } from 'luxon';
 import DotsLoader from './DotsLoader.vue';
 
@@ -69,13 +69,7 @@ interface ConversationTurn {
     reply_datetime?: DateTime;
 }
 
-const conversation_turns: Array<ConversationTurn> = reactive([
-    {
-        input: '',
-        reply: 'How can I help you today?',
-        reply_datetime: DateTime.now()
-    }
-])
+const conversation_turns: Array<ConversationTurn> = reactive([])
 
 const input_message = ref<string>('');
 
@@ -120,6 +114,11 @@ async function sendMessage() {
         console.error('failed to get chat response reader', { response })
     }
 }
+
+onMounted(async () => {
+    input_message.value = 'hello!';
+    await sendMessage();
+})
 
 </script>
 
