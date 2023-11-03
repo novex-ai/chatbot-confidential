@@ -120,7 +120,7 @@ async def process_file_upload(file_upload_id: int):
     for i, chunk_text in enumerate(text_chunks):
         # TODO consider generating multiple questions per chunk
         prompt_msg = f"Generate a standard question that is best answered by the following: {chunk_text}"
-        async with generate_text(logger, prompt_msg, stream=False) as response:
+        async with generate_text(prompt_msg, stream=False) as response:
             response.raise_for_status()
             data = await response.json()
             question = data["response"]

@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 import os
 
 import aiohttp
+from sanic.log import logger
 
 
 APP_OLLAMA_HOST: str = os.environ.get("APP_OLLAMA_HOST", "")
@@ -12,7 +13,7 @@ OLLAMA_MODEL = "mistral-openorca"
 
 
 @asynccontextmanager
-async def generate_text(logger, prompt_msg: str, stream: bool):
+async def generate_text(prompt_msg: str, stream: bool):
     generate_url = f"http://{APP_OLLAMA_HOST}/api/generate"
     generate_request = {
         "model": OLLAMA_MODEL,

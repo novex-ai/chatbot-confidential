@@ -65,7 +65,7 @@ Question: {chat_msg}"""
         prompt_msg = chat_msg
     sanic_response = await request.respond(content_type="text/plain")
     complete_text = ""
-    async with generate_text(logger, prompt_msg, stream=True) as response:
+    async with generate_text(prompt_msg, stream=True) as response:
         response.raise_for_status()
         async for data in response.content.iter_any():
             data_str = data.decode("utf-8")

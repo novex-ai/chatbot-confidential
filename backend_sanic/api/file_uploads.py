@@ -26,6 +26,7 @@ bp = Blueprint("file_uploads")
 )
 async def get_file_uploads(request: Request):
     """Get all file uploads"""
+    logger.info("handling get_file_uploads")
     session = request.ctx.session
     async with session.begin():
         result = await session.execute(
