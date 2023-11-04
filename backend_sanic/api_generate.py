@@ -1,5 +1,6 @@
 from contextlib import asynccontextmanager
 import os
+import socket
 
 import aiohttp
 from sanic.log import logger
@@ -14,6 +15,7 @@ OLLAMA_MODEL = "mistral-openorca"
 
 @asynccontextmanager
 async def generate_text(prompt_msg: str, stream: bool):
+    global _ollama_model_pulled
     generate_url = f"http://{APP_OLLAMA_HOST}/api/generate"
     generate_request = {
         "model": OLLAMA_MODEL,
@@ -21,7 +23,11 @@ async def generate_text(prompt_msg: str, stream: bool):
         "stream": stream,
     }
     logger.info(f"generate text {generate_url=} {generate_request=}")
-    session = aiohttp.ClientSession()
+    session = aiohttp.ClientSession(
+        connector=aiohttp.TCPConnector(
+            family=socket.AF_INET, verify_ssl=False, use_dns_cache=False
+        )
+    )
     try:
         response = await session.post(generate_url, json=generate_request)
         logger.info(f"{response.status=} from {generate_url=}")

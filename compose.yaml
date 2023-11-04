@@ -26,8 +26,6 @@ services:
     volumes:
       - /var/lib/postgresql/data
   ollama:
-    image: ollama/ollama:latest
+    image: phlogisticfugu/ollama-canned:0.1.7--mistral-openorca
     ports:
       - "11434:11434"
-    volumes:
-      - /root/.ollama
