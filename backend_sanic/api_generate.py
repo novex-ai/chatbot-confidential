@@ -15,7 +15,6 @@ OLLAMA_MODEL = "mistral-openorca"
 
 @asynccontextmanager
 async def generate_text(prompt_msg: str, stream: bool):
-    global _ollama_model_pulled
     generate_url = f"http://{APP_OLLAMA_HOST}/api/generate"
     generate_request = {
         "model": OLLAMA_MODEL,
