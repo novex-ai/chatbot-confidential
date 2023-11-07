@@ -116,7 +116,7 @@ async def process_file_upload(file_upload_id: int):
     text_chunks = [c for c in split_chunks(stored_path)]
     logger.info(f"split file into {len(text_chunks)=}")
     vectors = []
-    for i, chunk_text in enumerate(split_chunks(stored_path)):
+    for i, chunk_text in enumerate(text_chunks):
         # TODO consider generating multiple questions per chunk
         prompt_msg = f"Generate a standard question that is best answered by the following: {chunk_text}"
         async with generate_text(prompt_msg, stream=False) as response:
