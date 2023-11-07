@@ -66,7 +66,10 @@ Question: {chat_msg}"""
     sanic_response = await request.respond(content_type="text/plain")
     complete_text = ""
     async with generate_text(prompt_msg, stream=True) as response:
-        response.raise_for_status()
+        if response.status != 200:
+            response_json = await response.json()
+            logger.error(f"error from {response.url=} {response_json=}")
+            response.raise_for_status()
         async for data in response.content.iter_any():
             data_str = data.decode("utf-8")
             data_obj = json.loads(data_str)
