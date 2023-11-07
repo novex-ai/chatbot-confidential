@@ -8,17 +8,17 @@ services:
       - ollama
     environment:
       APP_DATA_PATH: /data
-      APP_POSTGRES_HOST: postgres:5432
+      APP_POSTGRES_HOST: postgres:5433
       APP_POSTGRES_USER: postgres
       APP_POSTGRES_PASSWORD: postgres
       APP_POSTGRES_DB: postgres
-      APP_OLLAMA_HOST: ollama:11434
+      APP_OLLAMA_HOST: ollama:11435
     volumes:
       - /tmp/chatbot-data:/data
   postgres:
     image: ankane/pgvector:v0.5.1
     ports:
-      - "5432:5432"
+      - "5433:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -26,4 +26,4 @@ services:
   ollama:
     image: ollama/ollama:latest
     ports:
-      - "11434:11434"
+      - "11435:11434"
