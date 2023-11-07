@@ -15,7 +15,6 @@ nanoid = "^2.0.0"
 pgvector = "^0.2.3"
 sanic = {version = "^23.6.0", extras = ["ext"]}
 sqlalchemy = {version = "^2.0.22", extras = ["asyncio"]}
-langchain = "^0.0.324"
 pypdf = "^3.17.0"
 python-docx = "^1.0.1"
 torch = "^2.1.0"

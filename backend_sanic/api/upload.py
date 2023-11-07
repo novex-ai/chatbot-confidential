@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from typing import List
+from typing import Generator
 
 from docx import Document as DocxDocument  # type: ignore
 from pypdf import PdfReader
@@ -65,37 +65,36 @@ def store_file(raw_filename: str, body_bytes: bytes) -> Path:
     return stored_path
 
 
-def split_chunks(stored_path: Path) -> List[str]:
+def split_chunks(stored_path: Path) -> Generator[str, None, None]:
     if not stored_path.is_file():
         raise Exception(f"could not find {stored_path=}")
     file_extension = stored_path.suffix
     if file_extension == ".txt":
         body_bytes = stored_path.read_bytes()
         input = body_bytes.decode("utf-8")
-        chunks = split_text_chunks(input)
+        return split_text_chunks(input)
     elif file_extension == ".pdf":
         pdf_reader = PdfReader(str(stored_path))
-        chunks = []
         for i, page in enumerate(pdf_reader.pages):
             page_text = page.extract_text()
             logger.info(f"{i=} processing page with {len(page_text)=}")
             if len(page_text) > 1000:
-                chunks += split_text_chunks(page_text)
+                for chunk in split_text_chunks(page_text):
+                    yield chunk
             elif len(page_text) > 0:
-                chunks.append(page_text)
+                yield page_text
     elif file_extension == ".docx":
         document = DocxDocument(str(stored_path))
-        chunks = []
         for i, paragraph in enumerate(document.paragraphs):
             paragraph_text = paragraph.text
             logger.info(f"{i=} processing paragraph with {len(paragraph_text)=}")
             if len(paragraph_text) > 1000:
-                chunks += split_text_chunks(paragraph_text)
+                for chunk in split_text_chunks(paragraph_text):
+                    yield chunk
             elif len(paragraph_text) > 0:
-                chunks.append(paragraph_text)
+                yield paragraph_text
     else:
         raise Exception(f"unknown file extension {file_extension}")
-    return chunks
 
 
 async def process_file_upload(file_upload_id: int):
@@ -114,10 +113,10 @@ async def process_file_upload(file_upload_id: int):
     stored_path = Path(_upload_path, stored_filename)
     # TODO - consider using a generator to be able to handle large files
     # then process chunks in batches
-    text_chunks = split_chunks(stored_path)
+    text_chunks = [c for c in split_chunks(stored_path)]
     logger.info(f"split file into {len(text_chunks)=}")
     vectors = []
-    for i, chunk_text in enumerate(text_chunks):
+    for i, chunk_text in enumerate(split_chunks(stored_path)):
         # TODO consider generating multiple questions per chunk
         prompt_msg = f"Generate a standard question that is best answered by the following: {chunk_text}"
         async with generate_text(prompt_msg, stream=False) as response:
