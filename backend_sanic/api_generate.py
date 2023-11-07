@@ -21,7 +21,7 @@ async def generate_text(prompt_msg: str, stream: bool):
         "prompt": prompt_msg,
         "stream": stream,
     }
-    logger.info(f"generate text {generate_url=} {generate_request=}")
+    logger.info(f"generate text {generate_url=} {prompt_msg=}")
     session = aiohttp.ClientSession(
         connector=aiohttp.TCPConnector(
             family=socket.AF_INET, verify_ssl=False, use_dns_cache=False
@@ -29,7 +29,7 @@ async def generate_text(prompt_msg: str, stream: bool):
     )
     try:
         response = await session.post(generate_url, json=generate_request)
-        logger.info(f"{response.status=} from {generate_url=}")
+        logger.info(f"{response.status=} from {generate_url=} {response.content=}")
         yield response
     finally:
         await session.close()
