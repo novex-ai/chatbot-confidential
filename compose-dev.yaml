@@ -24,6 +24,6 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
   ollama:
-    image: ollama/ollama:latest
+    image: phlogisticfugu/ollama-canned:0.1.8--mistral-openorca
     ports:
       - "11435:11434"
