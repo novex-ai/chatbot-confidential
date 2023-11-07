@@ -11,7 +11,7 @@ def split_text_chunks(
     chunk_overlap: int = SPLIT_TEXT_OVERLAP,
 ):
     start = 0
-    while start < len(input):
+    while start < len(input) - 1:
         end = start + chunk_size
         yield input[start:end]
         start += chunk_size - chunk_overlap
