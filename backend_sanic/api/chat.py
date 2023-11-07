@@ -39,22 +39,22 @@ async def chat(request: Request, body: ChatRequest):
     logger.info(f"{chat_msg=} {chat_embedding=}")
     session = request.ctx.session
     async with session.begin():
-        distance_col = EmbeddedChunk.vector.l2_distance(chat_embedding).label(
+        distance_col = EmbeddedChunk.vector.cosine_distance(chat_embedding).label(
             "distance"
         )
-        result = await session.scalars(
+        result = await session.execute(
             select(
                 EmbeddedChunk,
                 distance_col,
             )
-            .filter(distance_col < 1.0)
+            .filter(distance_col < 0.1)
             .order_by(distance_col.asc())
             .limit(4)
         )
-        rows = result.all()
-        logger.info(f"{rows=}")
-    if len(rows) > 0:
-        close_texts = [chunk.chunk_text for (chunk, _) in rows]
+        embedded_chunk_rows = result.all()
+        logger.info(f"{embedded_chunk_rows=}")
+    if len(embedded_chunk_rows) > 0:
+        close_texts = [chunk.chunk_text for (chunk, _) in embedded_chunk_rows]
         context = "\n###\n".join(close_texts)
         prompt_msg = f"""Use the following pieces of context to answer the
 question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer.
