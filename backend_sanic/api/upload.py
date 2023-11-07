@@ -17,6 +17,8 @@ from backend_sanic.models import FileUpload, EmbeddedChunk
 from backend_sanic.text import split_text_chunks
 
 
+UPLOAD_PROCESS_GENERATE_QUESTION = False
+
 APP_DATA_PATH: str = os.environ.get("APP_DATA_PATH", "")
 if not APP_DATA_PATH:
     raise Exception("APP_DATA_PATH environment variable not set")
@@ -119,16 +121,20 @@ async def process_file_upload(file_upload_id: int):
     logger.info(f"split file into {len(text_chunks)=}")
     vectors = []
     for i, chunk_text in enumerate(text_chunks):
-        # TODO consider generating multiple questions per chunk
-        prompt_msg = f"Generate a standard question that is best answered by the following: {chunk_text}"
-        async with generate_text(prompt_msg, stream=False) as response:
-            response.raise_for_status()
-            data = await response.json()
-            question = data["response"]
-            logger.debug(f"generated question {i=} {question=}")
-        vector = string_to_embeddings(question)
+        if UPLOAD_PROCESS_GENERATE_QUESTION:
+            # TODO consider generating multiple questions per chunk
+            prompt_msg = f"Generate a standard question that is best answered by the following: {chunk_text}"
+            async with generate_text(prompt_msg, stream=False) as response:
+                response.raise_for_status()
+                data = await response.json()
+                question = data["response"]
+                logger.debug(f"generated question {i=} {question=}")
+            to_embed_str = question
+        else:
+            to_embed_str = chunk_text
+        vector = string_to_embeddings(to_embed_str)
         logger.info(
-            f"processed {i=} {len(chunk_text)=} {len(question)=} {len(vector)=}"
+            f"processed {i=} {len(chunk_text)=} {len(to_embed_str)=} {len(vector)=}"
         )
         vectors.append(vector)
     async with make_session() as session:
