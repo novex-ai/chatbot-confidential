@@ -31,7 +31,7 @@ async def get_file_uploads(request: Request):
     async with session.begin():
         result = await session.execute(
             select(FileUpload, func.count(EmbeddedChunk.id).label("num_chunks"))
-            .join(EmbeddedChunk, FileUpload.id == EmbeddedChunk.file_upload_id)
+            .outerjoin(EmbeddedChunk, FileUpload.id == EmbeddedChunk.file_upload_id)
             .group_by(FileUpload.id)
             .order_by(FileUpload.uploaded_at.desc())
         )
