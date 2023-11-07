@@ -72,7 +72,9 @@ def split_chunks(stored_path: Path) -> Generator[str, None, None]:
     if file_extension == ".txt":
         body_bytes = stored_path.read_bytes()
         input = body_bytes.decode("utf-8")
-        return split_text_chunks(input)
+        logger.info(f"reading txt with {len(input)=}")
+        for chunk in split_text_chunks(input):
+            yield chunk
     elif file_extension == ".pdf":
         pdf_reader = PdfReader(str(stored_path))
         for i, page in enumerate(pdf_reader.pages):
