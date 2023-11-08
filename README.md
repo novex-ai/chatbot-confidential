@@ -4,10 +4,10 @@ Fully-contained private knowledgebase chatbot.  Ask questions about your own doc
 # Installation and Usage
 
 1. Download [Docker Desktop](https://www.docker.com/products/docker-desktop/) and install it on your local machine.
-2. Download [Ollama.ai](https://ollama.ai/download) and install it on your local machine
-3. Download the chatbot-confidential <a href="https://raw.githubusercontent.com/novex-ai/chatbot-confidential/main/compose.yaml" download>`compose.yaml`</a> - this uses [Docker Compose](https://docs.docker.com/compose/features-uses/) to define the `chatbot-confidential` app
+2. Download [ollama.ai](https://ollama.ai/download) and install it on your local machine
+3. Download the chatbot-confidential [compose.yaml](https://raw.githubusercontent.com/novex-ai/chatbot-confidential/main/compose.yaml) (right click and Save As...)
 4. Open your local command line terminal - [Mac Instructions](https://www.idownloadblog.com/2019/04/19/ways-open-terminal-mac/) | [Windows Instructions](https://www.digitalcitizen.life/open-windows-terminal/)
-5. Type `docker compose up` in the command line terminal, and hit enter.  (To stop, close the terminal)
+5. Navigate (cd _foldername_) to the folder where you downloaded `compose.yaml`.  Then type `docker compose up` in the command line terminal, and hit enter.  (To stop, close the terminal window, or use Ctl-C)
 6. Open http://localhost:8000/ in a browser on your machine
 
 # Features:
@@ -21,6 +21,7 @@ Implementation:
 - local LLM model: [OpenOrca - Mistral - 7B](https://huggingface.co/Open-Orca/Mistral-7B-OpenOrca) run using [ollama.ai](https://ollama.ai/)
 - local embedding model: [gte-large](https://huggingface.co/thenlper/gte-large) run using [ONNX Runtime](https://onnxruntime.ai/)
 - uses [pgvector](https://github.com/pgvector/pgvector) for local vector database - using cosine similarity and HNSW
+- uses [Docker Compose](https://docs.docker.com/compose/features-uses/)
 - Data is stored locally using [Docker Desktop Volumes](https://docs.docker.com/desktop/use-desktop/volumes/)
 
 # Developer Setup
