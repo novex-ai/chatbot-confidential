@@ -74,6 +74,17 @@ npm run build
 
 ### Develop
 
+create a local .env file in the `chatbot-confidential` folder:
+```
+APP_DATA_PATH=/tmp/chatbot-data
+APP_OLLAMA_HOST=0.0.0.0:11434
+APP_POSTGRES_HOST=0.0.0.0:5432
+APP_POSTGRES_USER=postgres
+APP_POSTGRES_PASSWORD=notsoseekret
+APP_POSTGRES_DB=postgres
+```
+and create the data path locally on your own machine 
+
 in the `chatbot-confidential` folder:
 ```bash
 poetry run sanic server:app --dev --tls=`echo ~/dev-tls/`
