@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "chatbot-confidential"
-version = "0.2.1"
+version = "0.3.0"
 description = "fully-contained (no external API calls) knowledgebase chatbot"
 authors = ["Brad Ito <phlogisticfugu@gmail.com>"]
 license = "MIT"
