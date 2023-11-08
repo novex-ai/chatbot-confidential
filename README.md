@@ -7,7 +7,8 @@ Fully-contained private knowledgebase chatbot.  Ask questions about your own doc
 2. Download [Ollama.ai](https://ollama.ai/download) and install it on your local machine
 3. Download the chatbot-confidential <a href="https://raw.githubusercontent.com/novex-ai/chatbot-confidential/main/compose.yaml" download>`compose.yaml`</a> - this uses [Docker Compose](https://docs.docker.com/compose/features-uses/) to define the `chatbot-confidential` app
 4. Open your local command line terminal - [Mac Instructions](https://www.idownloadblog.com/2019/04/19/ways-open-terminal-mac/) | [Windows Instructions](https://www.digitalcitizen.life/open-windows-terminal/)
-5. Type `docker compose up` in the command line terminal, and hit enter.  To stop, close the terminal
+5. Type `docker compose up` in the command line terminal, and hit enter.  (To stop, close the terminal)
+6. Open http://localhost:8000/ in a browser on your machine
 
 # Features:
 - runs entirely on LOCAL desktop machine: NO data in the cloud, NO API calls to the cloud
