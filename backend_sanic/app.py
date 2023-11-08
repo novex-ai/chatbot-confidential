@@ -1,12 +1,25 @@
+import sys
+
 from sanic import Sanic
 from sanic_ext import Extend
 from .api import bp as api_bp
+from .api_generate import pull_llm_model
 from .db import inject_sqlalchemy_session, close_sqlalchemy_session
 from .embeddings import get_embedding_model
 
 app = Sanic("app")
 app.config.CORS_ORIGINS = ["http://localhost:9000"]
 Extend(app)
+
+
+@app.main_process_start
+async def main_process_start(app):
+    """
+    Ensure that ollama.ai has pulled our model before we start serving requests
+    """
+    success = await pull_llm_model()
+    if not success:
+        sys.exit(1)
 
 
 @app.before_server_start
