@@ -115,40 +115,40 @@ async def process_file_upload(file_upload_id: int):
             file_upload.status = "PROCESSING"
     stored_filename = file_upload.stored_filename
     stored_path = Path(_upload_path, stored_filename)
-    # TODO - consider using a generator to be able to handle large files
-    # then process chunks in batches
-    text_chunks = [c for c in split_chunks(stored_path)]
-    logger.info(f"split file into {len(text_chunks)=}")
-    vectors = []
-    for i, chunk_text in enumerate(text_chunks):
-        if UPLOAD_PROCESS_GENERATE_QUESTION:
-            # TODO consider generating multiple questions per chunk
-            prompt_msg = f"Generate a standard question that is best answered by the following: {chunk_text}"
-            async with generate_text(prompt_msg, stream=False) as response:
-                response.raise_for_status()
-                data = await response.json()
-                question = data["response"]
-                logger.debug(f"generated question {i=} {question=}")
-            to_embed_str = question
-        else:
-            to_embed_str = chunk_text
-        vector = string_to_embeddings(to_embed_str)
-        logger.info(
-            f"processed {i=} {len(chunk_text)=} {len(to_embed_str)=} {len(vector)=}"
+
+    chunk_index = 0
+    embedded_chunks = []
+    async for chunk_tuple in _generate_chunk_tuples(split_chunks(stored_path)):
+        vector, chunk_text = chunk_tuple
+        embedded_chunk = EmbeddedChunk(
+            chunk_index=chunk_index,
+            file_upload_id=file_upload_id,
+            vector=vector,
+            chunk_text=chunk_text,
         )
-        vectors.append(vector)
+        embedded_chunks.append(embedded_chunk)
+        chunk_index += 1
+    logger.info(f"processed {file_upload_id=} into {len(embedded_chunks)=}")
     async with make_session() as session:
         async with session.begin():
             file_upload = await session.merge(file_upload)
-            embedded_chunks = []
-            for i, (chunk_text, vector) in enumerate(zip(text_chunks, vectors)):
-                embedded_chunk = EmbeddedChunk(
-                    chunk_index=i,
-                    file_upload_id=file_upload.id,
-                    vector=vector,
-                    chunk_text=chunk_text,
-                )
-                embedded_chunks.append(embedded_chunk)
             session.add_all(embedded_chunks)
             file_upload.status = "PROCESSED"
     logger.info(f"processed {file_upload_id=}")
+
+
+async def _generate_chunk_tuples(chunk_text_generator: Generator[str, None, None]):
+    for chunk_text in chunk_text_generator:
+        # TODO consider generating multiple questions per chunk
+        prompt_msg = f"Generate a standard question that is best answered by the following: {chunk_text}"
+        async with generate_text(prompt_msg, stream=False) as response:
+            response.raise_for_status()
+            data = await response.json()
+            question = data["response"]
+            logger.debug(f"generated question {question=}")
+        question_vector = string_to_embeddings(question)
+        logger.info(f"generated {len(question_vector)=} from {question=}")
+        yield (question_vector, chunk_text)
+        whole_chunk_vector = string_to_embeddings(chunk_text)
+        logger.info(f"generated {len(whole_chunk_vector)=} from {len(chunk_text)=}")
+        yield (whole_chunk_vector, chunk_text)
