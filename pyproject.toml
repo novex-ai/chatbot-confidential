@@ -7,7 +7,7 @@ license = "MIT"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "~3.11"
 aiohttp = "^3.8.6"
 alembic = "^1.12.0"
 asyncpg = "^0.28.0"
@@ -19,7 +19,8 @@ pypdf = "^3.17.0"
 python-docx = "^1.0.1"
 torch = "^2.1.0"
 transformers = "^4.35.0"
-onnxruntime = "^1.16.1"
+onnxruntime = {version = "^1.16.1", markers="platform_machine != 'arm64'"}
+onnxruntime-silicon = {version = "^1.16.0", markers="platform_machine == 'arm64'"}
 psutil = "^5.9.6"
 
 
