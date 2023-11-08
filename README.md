@@ -13,6 +13,7 @@ Fully-contained private knowledgebase chatbot.  Ask questions about your own doc
 # Features:
 - runs entirely on LOCAL desktop machine: NO data in the cloud, NO API calls to the cloud
 - includes data upload and processing of documents - supported file types: `.pdf` `.docx` `.txt`
+- supports Apple Silicon Neural Engine (M1, M2, etc) acceleration and does NOT require an NVIDIA GPU
 - uses Retrieval Augmentation (RAG) to find documents relevant to your chat question, and use that in answering
 - uses [Hypothetical Document Embeddings (HyDE)](https://arxiv.org/abs/2212.10496) for improved document relevance
 - also uses NEW question-generation approach for further improved document relevance (see future blog post) 
