@@ -35,26 +35,9 @@ async def chat(request: Request, body: ChatRequest):
     if not chat_msg:
         logger.error(f"{chat_msg=} not provided in {body=} {request.body=}")
         return text_response("error: msg not provided", status=400)
-    chat_embedding = string_to_embeddings(chat_msg)
-    logger.info(f"{chat_msg=} {chat_embedding=}")
-    session = request.ctx.session
-    async with session.begin():
-        distance_col = EmbeddedChunk.vector.cosine_distance(chat_embedding).label(
-            "distance"
-        )
-        result = await session.execute(
-            select(
-                EmbeddedChunk,
-                distance_col,
-            )
-            .filter(distance_col < 0.1)
-            .order_by(distance_col.asc())
-            .limit(4)
-        )
-        embedded_chunk_rows = result.all()
-        logger.info(f"{embedded_chunk_rows=}")
-    if len(embedded_chunk_rows) > 0:
-        close_texts = [chunk.chunk_text for (chunk, _) in embedded_chunk_rows]
+    close_chunks = await _select_close_chunks(request.ctx.session, chat_msg)
+    if len(close_chunks) > 0:
+        close_texts = [chunk.chunk_text for chunk in close_chunks]
         context = "\n###\n".join(close_texts)
         prompt_msg = f"""Use the following pieces of context to answer the
 question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer.
@@ -70,6 +53,34 @@ Question: {chat_msg}"""
     else:
         prompt_msg = chat_msg
     sanic_response = await request.respond(content_type="text/plain")
+    complete_text = await _pipe_generated_response(prompt_msg, sanic_response)
+    logger.info(f"handled {prompt_msg=} with {complete_text=}")
+
+
+async def _select_close_chunks(
+    session, search_str: str, max_distance: float = 0.1, limit: int = 4
+):
+    search_embedding = string_to_embeddings(search_str)
+    async with session.begin():
+        distance_col = EmbeddedChunk.vector.cosine_distance(search_embedding).label(
+            "distance"
+        )
+        result = await session.execute(
+            select(
+                EmbeddedChunk,
+                distance_col,
+            )
+            .filter(distance_col < max_distance)
+            .order_by(distance_col.asc())
+            .limit(limit)
+        )
+        embedded_chunk_rows = result.all()
+    logger.info(f"selecting close chunks {search_str=} {embedded_chunk_rows=}")
+    close_chunks = [chunk for (chunk, _) in embedded_chunk_rows]
+    return close_chunks
+
+
+async def _pipe_generated_response(prompt_msg: str, sanic_response):
     complete_text = ""
     async with generate_text(prompt_msg, stream=True) as response:
         if response.status != 200:
@@ -83,4 +94,4 @@ Question: {chat_msg}"""
             complete_text += response_text
             await sanic_response.send(response_text)
     await sanic_response.eof()
-    logger.info(f"handled {prompt_msg=} with {complete_text=}")
+    return complete_text
