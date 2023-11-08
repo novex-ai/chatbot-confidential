@@ -1,6 +1,6 @@
 services:
   app:
-    image: phlogisticfugu/chatbot-confidential-app:v0.3.1
+    image: phlogisticfugu/chatbot-confidential-app:v0.3.2
     ports:
        - "8000:8000"
     depends_on:
