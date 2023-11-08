@@ -1,13 +1,28 @@
 # chatbot-confidential
-fully-contained (no external API calls) knowledgebase chatbot
+Fully-contained private knowledgebase chatbot.  Ask questions about your own documents without data privacy issues.
 
-- deployable on AWS
-- leverages AWS Bedrock for LLM
-- includes data upload and processing of documents to use as knowledgebase
+# Installation and Usage
 
-_Naming: elephants are often described as having excellent memory.  This is like putting those pachyderms into a pen where you can keep an eye on that knowledge_
+1. Download [Docker Desktop](https://www.docker.com/products/docker-desktop/) and install it on your local machine.
+2. Download [Ollama.ai](https://ollama.ai/download) and install it on your local machine
+3. Download the chatbot-confidential <a href="https://raw.githubusercontent.com/novex-ai/chatbot-confidential/main/compose.yaml" download>`compose.yaml`</a> - this uses [Docker Compose](https://docs.docker.com/compose/features-uses/) to define the `chatbot-confidential` app
+4. Open your local command line terminal - [Mac Instructions](https://www.idownloadblog.com/2019/04/19/ways-open-terminal-mac/) | [Windows Instructions](https://www.digitalcitizen.life/open-windows-terminal/)
+5. Type `docker compose up` in the command line terminal, and hit enter.  To stop, close the terminal
 
-## Dev Setup
+# Features:
+- runs entirely on LOCAL desktop machine: NO data in the cloud, NO API calls to the cloud
+- includes data upload and processing of documents - supported file types: `.pdf` `.docx` `.txt`
+- uses Retrieval Augmentation (RAG) to find documents relevant to your chat question, and use that in answering
+- uses [Hypothetical Document Embeddings (HyDE)](https://arxiv.org/abs/2212.10496) for improved document relevance
+- also uses NEW question-generation approach for further improved document relevance (see future blog post) 
+
+Implementation:
+- local LLM model: [OpenOrca - Mistral - 7B](https://huggingface.co/Open-Orca/Mistral-7B-OpenOrca) run using [ollama.ai](https://ollama.ai/)
+- local embedding model: [gte-large](https://huggingface.co/thenlper/gte-large) run using [ONNX Runtime](https://onnxruntime.ai/)
+- uses [pgvector](https://github.com/pgvector/pgvector) for local vector database - using cosine similarity and HNSW
+- Data is stored locally using [Docker Desktop Volumes](https://docs.docker.com/desktop/use-desktop/volumes/)
+
+# Developer Setup
 
 Instructions on developer setup for macOS
 
@@ -16,7 +31,7 @@ Pre-requisites:
 - [Python Poetry](https://python-poetry.org/)
 - [nvm](https://github.com/nvm-sh/nvm)
 
-### Python Dev Setup
+### Python Developer Setup
 
 ```bash
 pyenv install 3.11
@@ -44,7 +59,7 @@ cp example.com+5.pem fullchain.pem
 chmod 0600 *.pem
 ```
 
-### Web Dev Setup
+### Web Developer Setup
 
 ```bash
 nvm install v18
@@ -62,6 +77,14 @@ npm run build
 in the `chatbot-confidential` folder:
 ```bash
 poetry run sanic server:app --dev --tls=`echo ~/dev-tls/`
+```
+
+in a new terminal window:
+```bash
+docker run -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=notsoseekret \
+  -p 5432:5432 \
+  -v postgres:/var/lib/postgresql/data \
+  ankane/pgvector:v0.5.1
 ```
 
 in a new terminal window, in the `chatbot-confidential` folder:
