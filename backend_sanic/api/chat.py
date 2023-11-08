@@ -36,6 +36,11 @@ async def chat(request: Request, body: ChatRequest):
         logger.error(f"{chat_msg=} not provided in {body=} {request.body=}")
         return text_response("error: msg not provided", status=400)
     close_chunks = await _select_close_chunks(request.ctx.session, chat_msg)
+    if chat_msg.endswith("?"):
+        hyde_response_text = await _generate_hyde_response_text(chat_msg)
+        close_chunks += await _select_close_chunks(
+            request.ctx.session, hyde_response_text
+        )
     if len(close_chunks) > 0:
         close_texts = [chunk.chunk_text for chunk in close_chunks]
         context = "\n###\n".join(close_texts)
@@ -55,6 +60,22 @@ Question: {chat_msg}"""
     sanic_response = await request.respond(content_type="text/plain")
     complete_text = await _pipe_generated_response(prompt_msg, sanic_response)
     logger.info(f"handled {prompt_msg=} with {complete_text=}")
+
+
+async def _generate_hyde_response_text(chat_msg: str):
+    """
+    Generate a response to a question using HyDE
+    https://arxiv.org/pdf/2212.10496.pdf
+    """
+    hyde_prompt_msg = f"write a paragraph that answers the question: {chat_msg}"
+    async with generate_text(hyde_prompt_msg, stream=False) as response:
+        if response.status != 200:
+            response_json = await response.json()
+            logger.error(f"error from {response.url=} {response_json=}")
+            response.raise_for_status()
+        data = await response.json()
+        hyde_response_text = data["response"]
+    return hyde_response_text
 
 
 async def _select_close_chunks(
