@@ -94,12 +94,15 @@ async function sendMessage() {
 
     console.log('sending chat message', { body, chat_api_url })
 
+    // define an abort controller to override the default fetch timeout
+    const abortController = new AbortController();
     const response = await fetch(chat_api_url, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body
+        body,
+        signal: abortController.signal
     })
     const reader = response.body?.getReader();
     if (reader) {
