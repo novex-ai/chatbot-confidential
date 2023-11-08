@@ -8,4 +8,4 @@ npm install
 npm run build
 cd ..
 
-docker buildx build --platform linux/amd64,linux/arm64 --push -t ${1:-chatbot-confidential-app} .
+docker buildx build --platform linux/arm64 --push -t ${1:-chatbot-confidential-app} .
