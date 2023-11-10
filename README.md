@@ -16,7 +16,7 @@ Fully-contained private knowledgebase chatbot.  Ask questions about your own doc
 - supports Apple Silicon Neural Engine (M1, M2, etc) acceleration and does NOT require an NVIDIA GPU
 - uses Retrieval Augmentation (RAG) to find documents relevant to your chat question, and use that in answering
 - uses [Hypothetical Document Embeddings (HyDE)](https://arxiv.org/abs/2212.10496) for improved document relevance
-- also uses NEW question-generation approach for further improved document relevance (see future blog post) 
+- also uses NEW question-generation approach for further improved document relevance (see my [blog post](https://bradito.me/blog/dont-jeopardize-your-rag/))
 
 Implementation:
 - local LLM model: [OpenOrca - Mistral - 7B](https://huggingface.co/Open-Orca/Mistral-7B-OpenOrca) run using [ollama.ai](https://ollama.ai/)
