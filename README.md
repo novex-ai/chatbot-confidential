@@ -25,6 +25,8 @@ Implementation:
 - uses [Docker Compose](https://docs.docker.com/compose/features-uses/)
 - Data is stored locally using [Docker Desktop Volumes](https://docs.docker.com/desktop/use-desktop/volumes/)
 
+![chatbot-confidential architecture](./chatbot-confidential.drawio.png)
+
 # Developer Setup
 
 Instructions on developer setup for macOS
