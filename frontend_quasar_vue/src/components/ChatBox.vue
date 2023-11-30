@@ -35,7 +35,7 @@
 
         <div class="input-container row q-ma-md">
             <q-input
-                v-model.trim="input_message"
+                v-model="input_message"
                 outlined
                 flat
                 dense
