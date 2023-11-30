@@ -49,7 +49,7 @@
                 icon="send"
                 class="col-1"
                 :disable="!input_message"
-                @click="sendMessage"
+                @click="sendMessage()"
             />
         </div>
     </div>
@@ -67,7 +67,7 @@ const conversation_turns_store = useConversationTurnsStore();
 
 const input_message = ref<string>('');
 
-async function sendMessage() {
+async function sendMessage(is_initial_message = false) {
     const input = input_message.value;
     if (!input) {
         return;
@@ -76,7 +76,8 @@ async function sendMessage() {
 
     const next_turn_index = conversation_turns_store.addInputTurn(input);
     const body = JSON.stringify({
-        msg: input
+        msg: input,
+        is_initial_message
     })
 
     console.log('sending chat message', { body, chat_api_url })
@@ -113,7 +114,7 @@ async function sendMessage() {
 onMounted(async () => {
     if (!conversation_turns_store.getTurns.length) {
         input_message.value = 'hello!';
-        await sendMessage();
+        await sendMessage(true);
     }
 })
 

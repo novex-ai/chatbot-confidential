@@ -5,16 +5,17 @@ from sanic import Blueprint, Request
 from sanic.response import text as text_response
 from sanic.log import logger
 from sanic_ext import openapi, validate
-from sqlalchemy import select
+from sqlalchemy import select, func
 
 from backend_sanic.api_generate import generate_text
 from backend_sanic.embeddings import string_to_embeddings
-from backend_sanic.models import EmbeddedChunk
+from backend_sanic.models import FileUpload, EmbeddedChunk
 
 
 @dataclass
 class ChatRequest:
     msg: str
+    is_initial_message: bool = False
 
 
 bp = Blueprint("chat")
@@ -32,11 +33,15 @@ async def chat(request: Request, body: ChatRequest):
     """Generate text from a prompt msg"""
     logger.info(f"handling {body=}")
     chat_msg = body.msg
+    is_initial_message = body.is_initial_message
     if not chat_msg:
         logger.error(f"{chat_msg=} not provided in {body=} {request.body=}")
         return text_response("error: msg not provided", status=400)
-    close_chunks = await _select_close_chunks(request.ctx.session, chat_msg)
-    if chat_msg.endswith("?"):
+    if is_initial_message:
+        close_chunks = []
+    else:
+        close_chunks = await _select_close_chunks(request.ctx.session, chat_msg)
+    if chat_msg.endswith("?") and not is_initial_message:
         hyde_response_text = await _generate_hyde_response_text(chat_msg)
         close_chunks += await _select_close_chunks(
             request.ctx.session, hyde_response_text
@@ -58,8 +63,22 @@ Question: {chat_msg}"""
     else:
         prompt_msg = chat_msg
     sanic_response = await request.respond(content_type="text/plain")
-    complete_text = await _pipe_generated_response(prompt_msg, sanic_response)
-    logger.info(f"handled {prompt_msg=} with {complete_text=}")
+    response_text = None
+    if is_initial_message:
+        num_file_uploads = await _get_num_file_uploads(request.ctx.session)
+        if num_file_uploads == 0:
+            response_text = (
+                "Upload a file to get started.  "
+                "You can upload a file by clicking the 'Data' tab above."
+            )
+            logger.info(
+                f"handled {prompt_msg=} {is_initial_message=} with {response_text=}"
+            )
+            await sanic_response.send(response_text)
+            await sanic_response.eof()
+    if response_text is None:
+        complete_text = await _pipe_generated_response(prompt_msg, sanic_response)
+        logger.info(f"handled {prompt_msg=} with {complete_text=}")
 
 
 async def _generate_hyde_response_text(chat_msg: str):
@@ -116,3 +135,10 @@ async def _pipe_generated_response(prompt_msg: str, sanic_response):
             await sanic_response.send(response_text)
     await sanic_response.eof()
     return complete_text
+
+
+async def _get_num_file_uploads(session):
+    async with session.begin():
+        result = await session.execute(select(func.count()).select_from(FileUpload))
+        num_file_uploads = result.scalar_one()
+    return num_file_uploads
