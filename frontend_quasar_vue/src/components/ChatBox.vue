@@ -10,7 +10,7 @@
                     label="Chat confidentially with your data"
                 />
                 <template
-                    v-for="(turn, index) in conversation_turns"
+                    v-for="(turn, index) in conversation_turns_store.getTurns"
                     :key="index"
                 >
                     <q-chat-message
@@ -56,21 +56,14 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, reactive } from 'vue';
-import { DateTime } from 'luxon';
+import { onMounted, ref } from 'vue';
 import DotsLoader from './DotsLoader.vue';
+import { useConversationTurnsStore } from 'src/stores/store-conversation-turns';
 
 const VITE_API_BASE_URL = import.meta.env.VITE_API_BASE_URL as string;
 const chat_api_url = `${VITE_API_BASE_URL}/chat`;
 
-interface ConversationTurn {
-    input: string;
-    input_datetime?: DateTime;
-    reply?: string;
-    reply_datetime?: DateTime;
-}
-
-const conversation_turns: Array<ConversationTurn> = reactive([])
+const conversation_turns_store = useConversationTurnsStore();
 
 const input_message = ref<string>('');
 
@@ -79,15 +72,9 @@ async function sendMessage() {
     if (!input) {
         return;
     }
-
-    const next_turn_index = conversation_turns.length;
-    conversation_turns.push({
-        input: input,
-        input_datetime: DateTime.now(),
-        reply: ''
-    })
     input_message.value = '';
 
+    const next_turn_index = conversation_turns_store.addInputTurn(input);
     const body = JSON.stringify({
         msg: input
     })
@@ -114,18 +101,20 @@ async function sendMessage() {
                 break;
             }
             if (value) {
-                conversation_turns[next_turn_index].reply += decoder.decode(value);
+                const fragment: string = decoder.decode(value);
+                conversation_turns_store.appendReplyFragmentToTurn(fragment, next_turn_index);
             }
         }
-        conversation_turns[next_turn_index].reply_datetime = DateTime.now();
     } else {
         console.error('failed to get chat response reader', { response })
     }
 }
 
 onMounted(async () => {
-    input_message.value = 'hello!';
-    await sendMessage();
+    if (!conversation_turns_store.getTurns.length) {
+        input_message.value = 'hello!';
+        await sendMessage();
+    }
 })
 
 </script>
