@@ -49,7 +49,7 @@
                 icon="send"
                 class="col-1"
                 :disable="!input_message"
-                @click="sendMessage()"
+                @click="sendMessage"
             />
         </div>
     </div>
@@ -62,12 +62,13 @@ import { useConversationTurnsStore } from 'src/stores/store-conversation-turns';
 
 const VITE_API_BASE_URL = import.meta.env.VITE_API_BASE_URL as string;
 const chat_api_url = `${VITE_API_BASE_URL}/chat`;
+const initial_chat_api_url = `${VITE_API_BASE_URL}/initial_chat`;
 
 const conversation_turns_store = useConversationTurnsStore();
 
 const input_message = ref<string>('');
 
-async function sendMessage(is_initial_message = false) {
+async function sendMessage() {
     const input = input_message.value;
     if (!input) {
         return;
@@ -75,23 +76,38 @@ async function sendMessage(is_initial_message = false) {
     input_message.value = '';
 
     const next_turn_index = conversation_turns_store.addInputTurn(input);
-    const body = JSON.stringify({
+    const body_obj = {
         msg: input,
-        is_initial_message
-    })
+    }
+    console.log('sending chat message', { body_obj, chat_api_url })
+    const response = await post_chat_api(chat_api_url, body_obj);
+    await stream_fetch_response_to_turn(response, next_turn_index);
+}
 
-    console.log('sending chat message', { body, chat_api_url })
+async function sendInitialMessage() {
+    const next_turn_index = conversation_turns_store.addInputTurn('');
+    const response = await post_chat_api(initial_chat_api_url);
+    await stream_fetch_response_to_turn(response, next_turn_index);
+}
 
+async function post_chat_api(url: string, body_obj?: object) {
     // define an abort controller to override the default fetch timeout
     const abortController = new AbortController();
-    const response = await fetch(chat_api_url, {
+    const options: Record<string, unknown> = {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body,
         signal: abortController.signal
-    })
+    }
+    if (body_obj) {
+        options.body = JSON.stringify(body_obj);;
+    }
+    const response = await fetch(url, options)
+    return response;
+}
+
+async function stream_fetch_response_to_turn(response: Response, next_turn_index: number) {
     const reader = response.body?.getReader();
     if (reader) {
         const decoder = new TextDecoder();
@@ -104,6 +120,7 @@ async function sendMessage(is_initial_message = false) {
             if (value) {
                 const fragment: string = decoder.decode(value);
                 conversation_turns_store.appendReplyFragmentToTurn(fragment, next_turn_index);
+                console.log('stream_fetch_response', { fragment })
             }
         }
     } else {
@@ -113,8 +130,7 @@ async function sendMessage(is_initial_message = false) {
 
 onMounted(async () => {
     if (!conversation_turns_store.getTurns.length) {
-        input_message.value = 'hello!';
-        await sendMessage(true);
+        await sendInitialMessage();
     }
 })
 
